@@ -3,9 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -105,13 +108,50 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <Link
-          href="/quote"
-          className="hidden rounded-full bg-primary px-5 py-2 text-white md:block hover:bg-green-950 transition shadow-glow hover:shadow-[0_0_25px_rgba(31,107,79,0.5)]"
-        >
-          Get Quotation
-        </Link>
+        {/* Desktop User Section */}
+        <div className="hidden items-center gap-4 md:flex">
+          {user ? (
+            <>
+              <div className="flex items-center gap-3">
+                {user?.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white font-semibold">
+                    {user.displayName?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                <span className="font-medium text-dark">
+                  {user.displayName}
+                </span>
+              </div>
+
+              <LogoutButton />
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="rounded-full border border-primary px-5 py-2 text-primary transition hover:bg-primary hover:text-white"
+              >
+                Login
+              </Link>
+
+              <Link
+                href="/quote"
+                className="rounded-full bg-primary px-5 py-2 text-white transition hover:bg-green-950"
+              >
+                Get Quotation
+              </Link>
+            </>
+          )}
+        </div>
 
         {/* Mobile Menu Button */}
         <button
@@ -147,13 +187,56 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="border-t border-black/10 my-2" />
-              <Link
-                href="/quote"
-                onClick={() => setOpen(false)}
-                className="w-full rounded-full bg-primary px-5 py-3 text-white text-center font-medium hover:bg-green-900 transition shadow-glow hover:shadow-[0_0_25px_rgba(31,107,79,0.5)]"
-              >
-                Get Quotation
-              </Link>
+
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    {user?.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white font-semibold">
+                    {user.displayName?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                    <div>
+                      <p className="font-semibold">
+                        {user.displayName}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <LogoutButton />
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="w-full rounded-full border border-primary px-5 py-3 text-center font-medium text-primary" 
+                  >
+                    Login
+                  </Link>
+
+                  <Link
+                    href="/quote"
+                    onClick={() => setOpen(false)}
+                    className="mt-3 w-full rounded-full bg-primary px-5 py-3 text-center font-medium text-white"
+                  >
+                    Get Quotation
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </>

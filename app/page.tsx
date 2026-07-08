@@ -1,3 +1,5 @@
+"use client";
+
 import ScrollReveal from "../components/ScrollReveal";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -17,6 +19,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <About />
+        <Manufacturing />
         <Services />
         <Products />
         <Stats />

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import WelcomeScreen from "./WelcomeScreen";
+import { auth } from "@/lib/firebase";
 
 export default function ScrollReveal({
   children,
@@ -10,10 +12,24 @@ export default function ScrollReveal({
   children: React.ReactNode;
 }) {
   const [hideWelcome, setHideWelcome] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     document.body.style.overflow = hideWelcome ? "auto" : "hidden";
   }, [hideWelcome]);
+
+  useEffect(() => {
+    if (!hideWelcome) return;
+      const timer = setTimeout(() => {
+        if (auth.currentUser) {
+          router.push("/");
+        } else {
+          router.push("/login");
+        }
+      }, 1000); // Wait for the animation to finish
+
+      return () => clearTimeout(timer);
+  }, [hideWelcome, router]);
 
   useEffect(() => {
     let accumulatedDelta = 0;
