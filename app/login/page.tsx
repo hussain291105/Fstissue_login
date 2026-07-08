@@ -146,7 +146,7 @@ export default function LoginPage() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/login.mp4" type="video/mp4" />
+        <source src="/Login.mp4" type="video/mp4" />
       </video>
 
       {/* Dark Overlay */}

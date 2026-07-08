@@ -119,7 +119,7 @@ export default function SignupPage() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/signup.mp4" type="video/mp4" />
+        <source src="/Signup.mp4" type="video/mp4" />
       </video>
 
       {/* Overlay */}
