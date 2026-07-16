@@ -8,7 +8,13 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth, provider, db } from "@/lib/firebase";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { 
+  doc, 
+  getDoc,
+  serverTimestamp, 
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,18 +34,27 @@ export default function LoginPage() {
 
       const user = result.user;
 
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
+      const userRef = doc(db, "users", user.uid);
+
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
           uid: user.uid,
           displayName: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
-        },
-        { merge: true }
-      );
+        });
+      } else {
+        await updateDoc(userRef, {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          lastLogin: serverTimestamp(),
+        });
+      }
 
       router.replace("/");
     } catch (err) {
@@ -63,11 +78,20 @@ export default function LoginPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(
+      const result = await signInWithEmailAndPassword(
         auth,
         email.trim(),
         password
       );
+
+      const user = result.user;
+
+      await updateDoc(doc(db, "users", user.uid), {
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        lastLogin: serverTimestamp(),
+      });
 
       router.replace("/");
     } catch (error: any) {
