@@ -2,7 +2,12 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import {
+  doc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 type AuthContextType = {
   user: User | null;
@@ -23,10 +28,32 @@ export function AuthProvider({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (currentUser) => {
+        setUser(currentUser);
+
+        if (currentUser) {
+          try {
+            await updateDoc(
+              doc(db, "users", currentUser.uid),
+              {
+                lastLogin: serverTimestamp(),
+              }
+            );
+
+            console.log("lastLogin updated");
+          } catch (error) {
+            console.error(
+              "Failed to update lastLogin:",
+              error
+            );
+          }
+        }
+
+        setLoading(false);
+      }
+    );
 
     return unsubscribe;
   }, []);
